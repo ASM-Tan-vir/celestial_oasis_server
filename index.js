@@ -27,7 +27,7 @@ app.use(logger);
 
 const verifyToken = async (req, res, next) => {
   const token = req?.cookies?.token;
-  console.log("verify token", token);
+  // console.log("verify token", token);
   if (!token) {
     return res.status(401).send({ massage: "forbidden" });
   }
