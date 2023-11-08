@@ -29,7 +29,7 @@ const verifyToken = async (req, res, next) => {
   const token = req?.cookies?.token;
   // console.log("verify token", token);
   if (!token) {
-    return res.status(401).send({ massage: "forbidden" });
+    return res.status(401).send({ massage: "unauthorized access" });
   }
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
     if (err) {
