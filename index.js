@@ -34,12 +34,13 @@ const verifyToken = async (req, res, next) => {
   jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
     if (err) {
       console.error(err);
-      return res.status(401).send({ massage: "unauthorized" });
+      return res.status(401).send({ massage: "unauthorized access" });
     }
     console.log("value decoded", decoded);
     req.user = decoded;
+
+    next();
   });
-  next();
 };
 
 app.use(verifyToken);
