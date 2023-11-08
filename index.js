@@ -36,7 +36,7 @@ const verifyToken = async (req, res, next) => {
       console.error(err);
       return res.status(401).send({ massage: "unauthorized access" });
     }
-    console.log("value decoded", decoded);
+    // console.log("value decoded", decoded);
     req.user = decoded;
 
     next();
