@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -15,6 +16,33 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(cookieParser());
+
+const logger = (req, res, next) => {
+  console.log("login info", req.method, req.url);
+  next();
+};
+
+app.use(logger);
+
+const verifyToken = async (req, res, next) => {
+  const token = req?.cookies?.token;
+  console.log("verify token", token);
+  if (!token) {
+    return res.status(401).send({ massage: "forbidden" });
+  }
+  jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+    if (err) {
+      console.error(err);
+      return res.status(401).send({ massage: "unauthorized" });
+    }
+    console.log("value decoded", decoded);
+    req.user = decoded;
+  });
+  next();
+};
+
+app.use(verifyToken);
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.t2wjj.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -50,6 +78,12 @@ async function run() {
         .send({ success: true });
     });
 
+    app.post("/logout", async (req, res) => {
+      const user = req.body;
+      console.log("loging out", user);
+      res.cookie("token", { maxAge: 0 }).send({ success: true });
+    });
+
     //services api
 
     app.get("/services", async (req, res) => {
@@ -78,7 +112,7 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/bookings", async (req, res) => {
+    app.post("/bookings", verifyToken, logger, async (req, res) => {
       const booking = req.body;
 
       const existingBooking = await bookingCollection.findOne({
@@ -114,7 +148,7 @@ async function run() {
     });
 
     app.get("/bookings", async (req, res) => {
-      // console.log("token:-", req.cookies.token);
+      console.log("token:-", req.cookies.token);
       console.log("user from the valid token", req.user);
       // if (req.query.email !== req.user.email) {
       //   return res.status(403).send({ message: "forbidden" });
