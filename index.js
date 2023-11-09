@@ -13,7 +13,7 @@ const port = process.env.PORT || 5000;
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
+      // "http://localhost:5173",
       "https://hotel-room-web-861cf.web.app",
       "https://hotel-room-web-861cf.firebaseapp.com",
     ],
@@ -22,11 +22,6 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-
-// const logger = (req, res, next) => {
-//   console.log("login info", req.method, req.url);
-//   next();
-// };
 
 console.log("token from consol log :-", process.env.ACCESS_TOKEN);
 
@@ -48,11 +43,8 @@ const verifyToken = async (req, res, next) => {
   next();
 };
 
-// app.use(verifyToken);
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.t2wjj.mongodb.net/?retryWrites=true&w=majority`;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -63,7 +55,6 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
     const roomsDataDetails = client.db("hotelsData").collection("room-details");
@@ -136,25 +127,6 @@ async function run() {
       res.send(result);
     });
 
-    // app.delete("/bookings/:id", async (req, res) => {
-    //   const bookingId = req.params.id;
-
-    //   const existingBooking = await bookingCollection.findOne({
-    //     _id: new ObjectId(bookingId),
-    //   });
-
-    //   const timeLeft = intervalToDuration({
-    //     start: new Date(existingBooking.date),
-    //     end: new Date(),
-    //   });
-
-    //   if (timeLeft.years || timeLeft.months || timeLeft.days) {
-    //     const result = bookingCollection.deleteOne({
-    //       _id: new ObjectId(existingBooking._id),
-    //     });
-    //     res.send(result);
-    //   }
-    // });
     app.delete("/bookings/:id", async (req, res) => {
       try {
         const bookingId = req.params.id;
